@@ -1,0 +1,61 @@
+{% extends 'studybuddy/base.html' %}
+{% block title %}Log In | StudyBuddy{% endblock %}
+
+{% block content %}
+<div class="auth-wrapper">
+    <div class="auth-card">
+        <div class="auth-header">
+            <span class="brand-mark" style="margin: 0 auto; width: 44px; height: 44px; font-size: 1.3rem;" aria-hidden="true">S</span>
+            <h1>Welcome Back</h1>
+            <p>Sign in to access your study matches and session updates</p>
+        </div>
+
+        <form method="post" action="{% url 'studybuddy:login' %}">
+            {% csrf_token %}
+
+            {% if form.non_field_errors %}
+                <div class="alert alert-error" style="margin-bottom: 20px;">
+                    <div class="alert-content">
+                        <i data-lucide="alert-circle"></i>
+                        <span>{{ form.non_field_errors }}</span>
+                    </div>
+                </div>
+            {% endif %}
+
+            <div class="form-group">
+                <label class="form-label" for="{{ form.username.id_for_label }}">Email or Username</label>
+                <div class="form-input-with-icon">
+                    <i data-lucide="mail"></i>
+                    {{ form.username }}
+                </div>
+                {% if form.username.errors %}
+                    <ul class="form-errors">{% for err in form.username.errors %}<li>{{ err }}</li>{% endfor %}</ul>
+                {% endif %}
+            </div>
+
+            <div class="form-group">
+                <label class="form-label" for="{{ form.password.id_for_label }}">Password</label>
+                <div class="form-input-with-icon">
+                    <i data-lucide="lock"></i>
+                    {{ form.password }}
+                    <button class="password-toggle-btn" type="button" data-toggle-password="#{{ form.password.id_for_label }}" aria-label="Toggle password visibility">
+                        <i data-lucide="eye"></i>
+                    </button>
+                </div>
+                {% if form.password.errors %}
+                    <ul class="form-errors">{% for err in form.password.errors %}<li>{{ err }}</li>{% endfor %}</ul>
+                {% endif %}
+            </div>
+
+            <button class="btn btn-primary btn-lg btn-full" type="submit" style="margin-top: 10px;">
+                <i data-lucide="log-in"></i> Log In
+            </button>
+        </form>
+
+        <div class="auth-footer">
+            <span>Don't have an account yet?</span>
+            <a href="{% url 'studybuddy:register' %}">Create account</a>
+        </div>
+    </div>
+</div>
+{% endblock %}

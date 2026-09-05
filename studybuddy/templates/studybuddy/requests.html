@@ -1,0 +1,135 @@
+{% extends 'studybuddy/base.html' %}
+{% block title %}Study Requests | StudyBuddy{% endblock %}
+
+{% block content %}
+<div class="page-wrapper" style="max-width: 900px;">
+    <div class="page-header">
+        <h1 class="page-title">Study Requests</h1>
+        <p class="page-subtitle">Manage invitations from peers and track requests you have sent.</p>
+    </div>
+
+    <!-- Segmented Tab Switcher -->
+    <div class="request-tabs" role="tablist">
+        <button class="request-tab-btn active" type="button" data-request-tab="received">
+            <i data-lucide="inbox"></i>
+            <span>Received</span>
+            <span class="nav-link-badge">{{ received_requests|length }}</span>
+        </button>
+        <button class="request-tab-btn" type="button" data-request-tab="sent">
+            <i data-lucide="send"></i>
+            <span>Sent</span>
+            <span class="tag" style="padding: 2px 6px; font-size: 0.72rem;">{{ sent_requests|length }}</span>
+        </button>
+        <button class="request-tab-btn" type="button" data-request-tab="all">
+            <span>View All</span>
+        </button>
+    </div>
+
+    <!-- Received Requests Section -->
+    <section class="request-section" id="section-received-requests">
+        <h2 class="request-section-title">
+            <i data-lucide="inbox" style="color: var(--primary);"></i> Received Invitations
+        </h2>
+
+        {% for study_request in received_requests %}
+            <article class="request-card">
+                <div class="request-main-content">
+                    <div class="request-user-info">
+                        <div class="avatar avatar-blue" style="width: 42px; height: 42px; font-size: 1.05rem;">
+                            {{ study_request.sender.user.first_name|slice:":1"|default:study_request.sender.user.username|slice:":1"|upper }}
+                        </div>
+                        <div>
+                            <h3>{{ study_request.sender }}</h3>
+                            <p>{{ study_request.sender.programme.name }} · Level {{ study_request.sender.level }}</p>
+                        </div>
+                    </div>
+
+                    {% if study_request.message %}
+                        <blockquote class="request-message-quote">
+                            "{{ study_request.message }}"
+                        </blockquote>
+                    {% endif %}
+                </div>
+
+                <div class="request-actions">
+                    <span class="tag {% if study_request.status == 'accepted' %}tag-green{% elif study_request.status == 'rejected' %}tag-red{% else %}tag-blue{% endif %}">
+                        {{ study_request.get_status_display }}
+                    </span>
+
+                    {% if study_request.status == 'pending' %}
+                        <form method="post" action="{% url 'studybuddy:update_study_request' study_request.pk 'accept' %}">
+                            {% csrf_token %}
+                            <button class="btn btn-primary btn-sm" type="submit">
+                                <i data-lucide="check"></i> Accept
+                            </button>
+                        </form>
+                        <form method="post" action="{% url 'studybuddy:update_study_request' study_request.pk 'reject' %}">
+                            {% csrf_token %}
+                            <button class="btn btn-secondary btn-sm" type="submit" style="color: var(--danger);">
+                                <i data-lucide="x"></i> Decline
+                            </button>
+                        </form>
+                    {% endif %}
+                </div>
+            </article>
+        {% empty %}
+            <div class="empty-state">
+                <div class="empty-state-icon">
+                    <i data-lucide="inbox"></i>
+                </div>
+                <h2>No study invitations yet</h2>
+                <p>When other students reach out to study with you, their requests will appear here.</p>
+                <a class="btn btn-primary" href="{% url 'studybuddy:find_partners' %}">
+                    <i data-lucide="search"></i> Find Partners
+                </a>
+            </div>
+        {% endfor %}
+    </section>
+
+    <!-- Sent Requests Section -->
+    <section class="request-section" id="section-sent-requests" style="display: none;">
+        <h2 class="request-section-title">
+            <i data-lucide="send" style="color: var(--primary);"></i> Sent Requests
+        </h2>
+
+        {% for study_request in sent_requests %}
+            <article class="request-card">
+                <div class="request-main-content">
+                    <div class="request-user-info">
+                        <div class="avatar avatar-amber" style="width: 42px; height: 42px; font-size: 1.05rem;">
+                            {{ study_request.receiver.user.first_name|slice:":1"|default:study_request.receiver.user.username|slice:":1"|upper }}
+                        </div>
+                        <div>
+                            <h3>{{ study_request.receiver }}</h3>
+                            <p>{{ study_request.receiver.programme.name }} · Level {{ study_request.receiver.level }}</p>
+                        </div>
+                    </div>
+
+                    {% if study_request.message %}
+                        <blockquote class="request-message-quote">
+                            "{{ study_request.message }}"
+                        </blockquote>
+                    {% endif %}
+                </div>
+
+                <div class="request-actions">
+                    <span class="tag {% if study_request.status == 'accepted' %}tag-green{% elif study_request.status == 'rejected' %}tag-red{% else %}tag-amber{% endif %}">
+                        {{ study_request.get_status_display }}
+                    </span>
+                </div>
+            </article>
+        {% empty %}
+            <div class="empty-state">
+                <div class="empty-state-icon">
+                    <i data-lucide="send"></i>
+                </div>
+                <h2>You haven't sent any requests yet</h2>
+                <p>Find students taking your courses and invite them to study together.</p>
+                <a class="btn btn-primary" href="{% url 'studybuddy:find_partners' %}">
+                    Browse Partners
+                </a>
+            </div>
+        {% endfor %}
+    </section>
+</div>
+{% endblock %}

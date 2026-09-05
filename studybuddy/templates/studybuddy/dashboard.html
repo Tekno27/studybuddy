@@ -1,0 +1,200 @@
+{% extends 'studybuddy/base.html' %}
+{% block title %}Dashboard | StudyBuddy{% endblock %}
+
+{% block content %}
+<div class="dashboard-layout">
+    <!-- Left Sticky Sidebar -->
+    <aside class="dashboard-sidebar">
+        <div class="profile-card">
+            <div class="profile-card-avatar">
+                {{ profile.user.first_name|slice:":1"|default:profile.user.username|slice:":1"|upper }}
+            </div>
+            <h2>{{ profile.user.get_full_name|default:profile.user.username }}</h2>
+            <p class="profile-card-academic">
+                {{ profile.programme.name }}<br>
+                <strong>Level {{ profile.level }}</strong> · {{ profile.university.name }}
+            </p>
+
+            <div class="sidebar-stats">
+                <div class="sidebar-stat-item">
+                    <span>Courses</span>
+                    <strong>{{ profile.courses.count }}</strong>
+                </div>
+                <div class="sidebar-stat-item">
+                    <span>Partners</span>
+                    <strong>{{ accepted_request_count }}</strong>
+                </div>
+                <div class="sidebar-stat-item">
+                    <span>Pending</span>
+                    <strong>{{ pending_request_count }}</strong>
+                </div>
+            </div>
+        </div>
+
+        <nav class="sidebar-nav" aria-label="Sidebar Navigation">
+            <a class="active" href="{% url 'studybuddy:dashboard' %}">
+                <i data-lucide="layout-dashboard"></i> Dashboard
+            </a>
+            <a href="{% url 'studybuddy:find_partners' %}">
+                <i data-lucide="search"></i> Find Partners
+            </a>
+            <a href="{% url 'studybuddy:requests' %}">
+                <i data-lucide="inbox"></i> Requests
+                {% if pending_request_count > 0 %}
+                    <span class="nav-link-badge" style="margin-left: auto;">{{ pending_request_count }}</span>
+                {% endif %}
+            </a>
+            <a href="{% url 'studybuddy:connections' %}">
+                <i data-lucide="users"></i> My Connections
+            </a>
+            <a href="{% url 'studybuddy:profile' %}">
+                <i data-lucide="user-round"></i> My Profile
+            </a>
+        </nav>
+
+        <div class="study-tip">
+            <div class="study-tip-header">
+                <i data-lucide="lightbulb"></i>
+                <span>Study Tip of the Day</span>
+            </div>
+            <p>
+                Teaching a difficult topic to your study partner is one of the most effective retention techniques known as the Feynman Technique.
+            </p>
+        </div>
+    </aside>
+
+    <!-- Main Dashboard Stream -->
+    <section class="dashboard-main">
+        <!-- Welcome Banner -->
+        <div class="welcome-banner">
+            <div class="welcome-copy">
+                <span>Welcome back</span>
+                <h1>{{ profile.user.first_name|default:profile.user.username }}.</h1>
+                <p>{{ profile.programme.name }} · Level {{ profile.level }}</p>
+            </div>
+            <a href="{% url 'studybuddy:find_partners' %}" class="btn dashboard-cta">
+                Find Study Partners <i data-lucide="arrow-right"></i>
+            </a>
+        </div>
+
+        <!-- 4 Stat Metric Cards -->
+        <div class="dashboard-stats">
+            <div class="stat-card">
+                <div class="stat-icon stat-icon-blue">
+                    <i data-lucide="users"></i>
+                </div>
+                <div class="stat-info">
+                    <span>Study Partners</span>
+                    <strong>{{ accepted_request_count }}</strong>
+                </div>
+            </div>
+
+            <div class="stat-card">
+                <div class="stat-icon stat-icon-amber">
+                    <i data-lucide="inbox"></i>
+                </div>
+                <div class="stat-info">
+                    <span>Pending Requests</span>
+                    <strong>{{ pending_request_count }}</strong>
+                </div>
+            </div>
+
+            <div class="stat-card">
+                <div class="stat-icon stat-icon-purple">
+                    <i data-lucide="book-open"></i>
+                </div>
+                <div class="stat-info">
+                    <span>Enrolled Courses</span>
+                    <strong>{{ profile.courses.count }}</strong>
+                </div>
+            </div>
+
+            <div class="stat-card">
+                <div class="stat-icon stat-icon-green">
+                    <i data-lucide="calendar"></i>
+                </div>
+                <div class="stat-info">
+                    <span>Upcoming Sessions</span>
+                    <strong>{{ session_count }}</strong>
+                </div>
+            </div>
+        </div>
+
+        <!-- Top Matches Section -->
+        <div>
+            <div class="content-header" style="margin-bottom: 20px;">
+                <div>
+                    <h2>Top Matches For You</h2>
+                    <span style="color: var(--text-muted); font-size: 0.875rem;">Ranked by curriculum compatibility</span>
+                </div>
+                <a class="btn btn-secondary btn-sm" href="{% url 'studybuddy:find_partners' %}">
+                    Explore All <i data-lucide="arrow-right"></i>
+                </a>
+            </div>
+
+            <div class="partners-grid">
+                {% for partner, score in top_matches %}
+                    <article class="partner-card">
+                        <div class="partner-header">
+                            <div class="partner-profile-meta">
+                                <div class="partner-avatar">
+                                    {{ partner.user.first_name|slice:":1"|default:partner.user.username|slice:":1"|upper }}
+                                </div>
+                                <div class="partner-name-box">
+                                    <h3>{{ partner }}</h3>
+                                    <p>{{ partner.programme.name }} · Level {{ partner.level }}</p>
+                                </div>
+                            </div>
+                            <div class="partner-score-pill">
+                                <strong>{{ score }}%</strong>
+                                <small>Match</small>
+                            </div>
+                        </div>
+
+                        <div class="tag-list">
+                            {% for course in partner.courses.all|slice:':3' %}
+                                <span class="tag tag-blue">{{ course.code }}</span>
+                            {% empty %}
+                                <span class="tag">General</span>
+                            {% endfor %}
+                        </div>
+
+                        <div class="partner-footer-tags">
+                            <span class="tag">{{ partner.get_study_preference_display }}</span>
+                            {% if partner.availability %}
+                                <span class="tag">{{ partner.availability }}</span>
+                            {% endif %}
+                        </div>
+
+                        <div class="partner-card-action">
+                            <button class="btn btn-primary btn-sm btn-full"
+                                    type="button"
+                                    data-open-request-modal
+                                    data-action-url="{% url 'studybuddy:send_study_request' partner.pk %}"
+                                    data-partner-name="{{ partner }}">
+                                <i data-lucide="user-plus"></i> Connect
+                            </button>
+                        </div>
+                    </article>
+                {% empty %}
+                    <div class="empty-state">
+                        <div class="empty-state-icon">
+                            <i data-lucide="search"></i>
+                        </div>
+                        <h2>No study matches found yet</h2>
+                        <p>Complete your profile and add your courses to discover compatible students in your program.</p>
+                        <div style="display: flex; gap: 10px;">
+                            <a class="btn btn-primary" href="{% url 'studybuddy:edit_profile' %}">
+                                <i data-lucide="edit-3"></i> Add Courses
+                            </a>
+                            <a class="btn btn-secondary" href="{% url 'studybuddy:find_partners' %}">
+                                Browse All Students
+                            </a>
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+        </div>
+    </section>
+</div>
+{% endblock %}

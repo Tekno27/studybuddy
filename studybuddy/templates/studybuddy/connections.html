@@ -1,0 +1,77 @@
+{% extends 'studybuddy/base.html' %}
+{% block title %}My Study Connections | StudyBuddy{% endblock %}
+
+{% block content %}
+<div class="matches-layout">
+    <div class="page-header">
+        <h1 class="page-title">My Study Connections</h1>
+        <p class="page-subtitle">Peers with whom you have formed an active study partnership.</p>
+    </div>
+
+    <div class="partners-grid">
+        {% for partner in connections %}
+            <article class="partner-card">
+                <div class="partner-header">
+                    <div class="partner-profile-meta">
+                        <div class="partner-avatar" style="background: linear-gradient(135deg, var(--success), #059669);">
+                            {{ partner.user.first_name|slice:":1"|default:partner.user.username|slice:":1"|upper }}
+                        </div>
+                        <div class="partner-name-box">
+                            <h2>{{ partner }}</h2>
+                            <p>{{ partner.programme.name }} · Level {{ partner.level }}</p>
+                        </div>
+                    </div>
+                    <span class="tag tag-green">
+                        <i data-lucide="check" style="width: 12px; height: 12px;"></i> Connected
+                    </span>
+                </div>
+
+                <div class="partner-info-row">
+                    <i data-lucide="map-pin" style="width: 14px; height: 14px; color: var(--text-muted);"></i>
+                    <span>{{ partner.university.name }}</span>
+                </div>
+
+                {% if partner.bio %}
+                    <p style="font-size: 0.85rem; color: var(--text-secondary); margin: 6px 0 12px; line-height: 1.5;">
+                        {{ partner.bio|truncatewords:20 }}
+                    </p>
+                {% endif %}
+
+                <div class="tag-list">
+                    {% for course in partner.courses.all|slice:':4' %}
+                        <span class="tag tag-blue">{{ course.code }}</span>
+                    {% empty %}
+                        <span class="tag">General courses</span>
+                    {% endfor %}
+                </div>
+
+                <div class="partner-footer-tags">
+                    <span class="tag">{{ partner.get_study_preference_display }}</span>
+                    {% if partner.availability %}
+                        <span class="tag tag-green">
+                            <i data-lucide="clock" style="width: 12px; height: 12px;"></i> {{ partner.availability }}
+                        </span>
+                    {% endif %}
+                </div>
+
+                <div class="partner-card-action">
+                    <a class="btn btn-secondary btn-sm btn-full" href="mailto:{{ partner.user.email }}">
+                        <i data-lucide="mail"></i> Email Partner
+                    </a>
+                </div>
+            </article>
+        {% empty %}
+            <div class="empty-state">
+                <div class="empty-state-icon" style="background: var(--success-light); color: var(--success);">
+                    <i data-lucide="users"></i>
+                </div>
+                <h2>No study connections yet</h2>
+                <p>Browse students enrolled in your courses, send them a study invitation, and start working together.</p>
+                <a class="btn btn-primary" href="{% url 'studybuddy:find_partners' %}">
+                    <i data-lucide="search"></i> Find Study Partners
+                </a>
+            </div>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %}

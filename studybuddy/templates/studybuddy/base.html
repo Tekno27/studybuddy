@@ -1,0 +1,253 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>{% block title %}StudyBuddy | Find Your Study People{% endblock %}</title>
+
+    <!-- Immediate theme initialization to prevent flash of light theme -->
+    <script>
+        (function() {
+            try {
+                var savedTheme = localStorage.getItem('studybuddy-theme');
+                var prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+                if (savedTheme === 'dark' || (!savedTheme && prefersDark)) {
+                    document.documentElement.classList.add('dark-theme');
+                }
+            } catch (e) {}
+        })();
+    </script>
+
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,100..1000;1,9..40,100..1000&family=Syne:wght@600;700;800&display=swap" rel="stylesheet">
+
+    <!-- Unified Stylesheet -->
+    {% load static %}
+    <link rel="stylesheet" href="{% static 'studybuddy/css/style.css' %}?v=4">
+
+    <!-- Lucide Icons & App Script -->
+    <script src="https://unpkg.com/lucide@0.468.0/dist/umd/lucide.min.js" defer></script>
+    <script src="{% static 'studybuddy/js/app.js' %}?v=4" defer></script>
+</head>
+<body>
+    <header class="site-header">
+        <nav class="site-nav" aria-label="Main Navigation">
+            <a class="brand" href="{% url 'studybuddy:home' %}">
+                <span class="brand-mark" aria-hidden="true">S</span>
+                <span>StudyBuddy</span>
+            </a>
+
+            {% if user.is_authenticated %}
+                <div class="nav-links">
+                    <a class="nav-link {% if request.resolver_match.url_name == 'home' %}active{% endif %}" href="{% url 'studybuddy:home' %}">
+                        <i data-lucide="house"></i>Home
+                    </a>
+                    <a class="nav-link {% if request.resolver_match.url_name == 'find_partners' %}active{% endif %}" href="{% url 'studybuddy:find_partners' %}">
+                        <i data-lucide="search"></i>Find Partners
+                    </a>
+                    <a class="nav-link {% if request.resolver_match.url_name == 'dashboard' %}active{% endif %}" href="{% url 'studybuddy:dashboard' %}">
+                        <i data-lucide="layout-dashboard"></i>Dashboard
+                    </a>
+                    <a class="nav-link {% if request.resolver_match.url_name == 'requests' %}active{% endif %}" href="{% url 'studybuddy:requests' %}">
+                        <i data-lucide="inbox"></i>Requests
+                        {% if user.student_profile and user.student_profile.received_requests.count > 0 %}
+                            {% with pending_count=user.student_profile.received_requests.filter.count %}
+                            {% endwith %}
+                        {% endif %}
+                    </a>
+                    <a class="nav-link {% if request.resolver_match.url_name == 'connections' %}active{% endif %}" href="{% url 'studybuddy:connections' %}">
+                        <i data-lucide="users"></i>Connections
+                    </a>
+                </div>
+
+                <div class="nav-actions">
+                    <button class="theme-toggle" type="button" data-theme-toggle aria-label="Toggle theme" title="Toggle theme">
+                        <i data-lucide="moon"></i>
+                    </button>
+                    <a class="user-profile-pill" href="{% url 'studybuddy:profile' %}" title="View profile">
+                        <span class="user-avatar-sm">{{ user.first_name|slice:":1"|default:user.username|slice:":1"|upper }}</span>
+                        <span>{{ user.first_name|default:user.username }}</span>
+                    </a>
+                    <form method="post" action="{% url 'studybuddy:logout' %}" style="margin:0;">
+                        {% csrf_token %}
+                        <button class="btn-logout" type="submit" title="Log out">
+                            <i data-lucide="log-out"></i> Log out
+                        </button>
+                    </form>
+                </div>
+            {% else %}
+                <div class="nav-links">
+                    <a class="nav-link {% if request.resolver_match.url_name == 'home' %}active{% endif %}" href="{% url 'studybuddy:home' %}">
+                        <i data-lucide="house"></i>Home
+                    </a>
+                    <a class="nav-link {% if request.resolver_match.url_name == 'find_partners' %}active{% endif %}" href="{% url 'studybuddy:find_partners' %}">
+                        <i data-lucide="search"></i>Find Partners
+                    </a>
+                </div>
+
+                <div class="nav-actions">
+                    <button class="theme-toggle" type="button" data-theme-toggle aria-label="Toggle theme" title="Toggle theme">
+                        <i data-lucide="moon"></i>
+                    </button>
+                    <a class="btn btn-secondary btn-sm" href="{% url 'studybuddy:login' %}">Log In</a>
+                    <a class="btn btn-primary btn-sm" href="{% url 'studybuddy:register' %}">Sign Up</a>
+                </div>
+            {% endif %}
+
+            <button class="mobile-menu-button" type="button" aria-expanded="false" aria-label="Toggle navigation">
+                <i data-lucide="menu"></i>
+            </button>
+        </nav>
+    </header>
+
+    <!-- Mobile Navigation Drawer -->
+    <div class="mobile-drawer-backdrop" aria-hidden="true"></div>
+    <aside class="mobile-drawer" aria-label="Mobile Menu">
+        <div class="mobile-drawer-header">
+            <a class="brand" href="{% url 'studybuddy:home' %}">
+                <span class="brand-mark" aria-hidden="true">S</span>
+                <span>StudyBuddy</span>
+            </a>
+            <button class="mobile-drawer-close" type="button" aria-label="Close menu">
+                <i data-lucide="x"></i>
+            </button>
+        </div>
+
+        {% if user.is_authenticated %}
+            <div style="margin-bottom: 20px; padding: 12px 14px; background: var(--card-subtle); border-radius: var(--radius-md); display: flex; align-items: center; gap: 12px;">
+                <span class="user-avatar-sm" style="width: 38px; height: 38px; font-size: 1rem;">{{ user.first_name|slice:":1"|default:user.username|slice:":1"|upper }}</span>
+                <div>
+                    <strong style="display: block; font-size: 0.95rem; color: var(--text);">{{ user.get_full_name|default:user.username }}</strong>
+                    <span style="font-size: 0.78rem; color: var(--text-muted);">{{ user.email }}</span>
+                </div>
+            </div>
+
+            <nav class="mobile-drawer-nav">
+                <a class="{% if request.resolver_match.url_name == 'home' %}active{% endif %}" href="{% url 'studybuddy:home' %}">
+                    <i data-lucide="house"></i> Home
+                </a>
+                <a class="{% if request.resolver_match.url_name == 'find_partners' %}active{% endif %}" href="{% url 'studybuddy:find_partners' %}">
+                    <i data-lucide="search"></i> Find Partners
+                </a>
+                <a class="{% if request.resolver_match.url_name == 'dashboard' %}active{% endif %}" href="{% url 'studybuddy:dashboard' %}">
+                    <i data-lucide="layout-dashboard"></i> Dashboard
+                </a>
+                <a class="{% if request.resolver_match.url_name == 'requests' %}active{% endif %}" href="{% url 'studybuddy:requests' %}">
+                    <i data-lucide="inbox"></i> Requests
+                </a>
+                <a class="{% if request.resolver_match.url_name == 'connections' %}active{% endif %}" href="{% url 'studybuddy:connections' %}">
+                    <i data-lucide="users"></i> Connections
+                </a>
+                <a class="{% if request.resolver_match.url_name == 'profile' %}active{% endif %}" href="{% url 'studybuddy:profile' %}">
+                    <i data-lucide="user-round"></i> My Profile
+                </a>
+            </nav>
+
+            <div class="mobile-drawer-footer">
+                <form method="post" action="{% url 'studybuddy:logout' %}">
+                    {% csrf_token %}
+                    <button class="btn btn-danger btn-full" type="submit">
+                        <i data-lucide="log-out"></i> Log Out
+                    </button>
+                </form>
+            </div>
+        {% else %}
+            <nav class="mobile-drawer-nav">
+                <a class="{% if request.resolver_match.url_name == 'home' %}active{% endif %}" href="{% url 'studybuddy:home' %}">
+                    <i data-lucide="house"></i> Home
+                </a>
+                <a class="{% if request.resolver_match.url_name == 'find_partners' %}active{% endif %}" href="{% url 'studybuddy:find_partners' %}">
+                    <i data-lucide="search"></i> Browse Partners
+                </a>
+                <a href="{% url 'studybuddy:login' %}">
+                    <i data-lucide="log-in"></i> Log In
+                </a>
+                <a href="{% url 'studybuddy:register' %}">
+                    <i data-lucide="user-plus"></i> Create Account
+                </a>
+            </nav>
+        {% endif %}
+    </aside>
+
+    <!-- Flash Notification Messages -->
+    {% if messages %}
+        <div class="alert-container" role="region" aria-label="Notifications">
+            {% for message in messages %}
+                <div class="alert alert-{% if message.tags == 'error' %}error{% elif message.tags == 'success' %}success{% elif message.tags == 'warning' %}warning{% else %}info{% endif %}" role="alert">
+                    <div class="alert-content">
+                        {% if message.tags == 'success' %}
+                            <i data-lucide="check-circle-2"></i>
+                        {% elif message.tags == 'error' %}
+                            <i data-lucide="alert-circle"></i>
+                        {% elif message.tags == 'warning' %}
+                            <i data-lucide="alert-triangle"></i>
+                        {% else %}
+                            <i data-lucide="info"></i>
+                        {% endif %}
+                        <span>{{ message }}</span>
+                    </div>
+                    <button class="alert-dismiss" type="button" aria-label="Dismiss message">
+                        <i data-lucide="x"></i>
+                    </button>
+                </div>
+            {% endfor %}
+        </div>
+    {% endif %}
+
+    <main id="main-content">
+        {% block content %}{% endblock %}
+    </main>
+
+    <!-- Global Study Request Note Modal -->
+    <div class="modal-backdrop" id="study-request-modal" aria-hidden="true" role="dialog" aria-labelledby="modal-title">
+        <div class="modal-dialog">
+            <div class="modal-header">
+                <h3 id="modal-title">Send Study Request</h3>
+                <button class="modal-close" type="button" data-close-modal aria-label="Close modal">
+                    <i data-lucide="x"></i>
+                </button>
+            </div>
+            <form method="post" action="">
+                {% csrf_token %}
+                <div class="modal-body">
+                    <p style="margin: 0 0 12px; color: var(--text-secondary); font-size: 0.9rem;">
+                        Reach out to <strong id="modal-partner-name">this student</strong> with a brief note:
+                    </p>
+                    <div class="form-group" style="margin-bottom: 0;">
+                        <textarea class="form-textarea" name="message" id="modal-partner-message" rows="3" placeholder="Add a short message about which courses or topics you want to study together..." style="resize: vertical;"></textarea>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button class="btn btn-secondary" type="button" data-close-modal>Cancel</button>
+                    <button class="btn btn-primary" type="submit">
+                        <i data-lucide="send"></i> Send Request
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <footer class="site-footer">
+        <div class="footer-inner">
+            <div class="footer-brand">
+                <span class="brand-mark" style="width: 26px; height: 26px; font-size: 0.85rem;" aria-hidden="true">S</span>
+                <span>StudyBuddy</span>
+                <span style="margin-left: 6px; font-weight: 400; font-size: 0.8125rem;">· Connecting students across universities in Ghana</span>
+            </div>
+            <div class="footer-links">
+                <a href="{% url 'studybuddy:home' %}">Home</a>
+                <a href="{% url 'studybuddy:find_partners' %}">Find Partners</a>
+                {% if user.is_authenticated %}
+                    <a href="{% url 'studybuddy:dashboard' %}">Dashboard</a>
+                    <a href="{% url 'studybuddy:profile' %}">Profile</a>
+                {% else %}
+                    <a href="{% url 'studybuddy:login' %}">Log In</a>
+                    <a href="{% url 'studybuddy:register' %}">Sign Up</a>
+                {% endif %}
+            </div>
+        </div>
+    </footer>
+</body>
+</html>

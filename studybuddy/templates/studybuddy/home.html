@@ -1,0 +1,182 @@
+{% extends 'studybuddy/base.html' %}
+{% block title %}StudyBuddy | Find Your Study People & Ace Together{% endblock %}
+
+{% block content %}
+<!-- Hero Section -->
+<section class="hero">
+    <div class="hero-copy">
+        <div class="eyebrow">
+            <i data-lucide="sparkles"></i>
+            <span>Ghana's Premier Student Study Network</span>
+        </div>
+        <h1>
+            Find your<br>
+            <span>study partner.</span><br>
+            Ace together.
+        </h1>
+        <p class="hero-subtext">
+            Connect with students taking your exact courses, level, and department. Share notes, test each other, and build study habits that stick.
+        </p>
+        <div class="hero-actions">
+            {% if user.is_authenticated %}
+                <a class="btn btn-primary btn-lg" href="{% url 'studybuddy:find_partners' %}">
+                    Find Partners <i data-lucide="arrow-right"></i>
+                </a>
+                <a class="btn btn-secondary btn-lg" href="{% url 'studybuddy:dashboard' %}">
+                    <i data-lucide="layout-dashboard"></i> Go to Dashboard
+                </a>
+            {% else %}
+                <a class="btn btn-primary btn-lg" href="{% url 'studybuddy:register' %}">
+                    Get Started Free <i data-lucide="arrow-right"></i>
+                </a>
+                <a class="btn btn-secondary btn-lg" href="{% url 'studybuddy:find_partners' %}">
+                    Browse Partners
+                </a>
+            {% endif %}
+        </div>
+        <div class="hero-stats">
+            <div class="hero-stat-item">
+                <strong>400+</strong>
+                <small>Active Students</small>
+            </div>
+            <div class="hero-stat-item">
+                <strong>12+</strong>
+                <small>Departments</small>
+            </div>
+            <div class="hero-stat-item">
+                <strong>95%</strong>
+                <small>Match Accuracy</small>
+            </div>
+        </div>
+    </div>
+
+    <!-- Hero Visual Preview Card -->
+    <div class="hero-visual">
+        <div class="hero-card">
+            <div class="hero-card-header">
+                <div class="hero-card-avatar avatar-blue">
+                    <span>AM</span>
+                </div>
+                <div>
+                    <h3 class="hero-card-title">Ama Mensah</h3>
+                    <p class="hero-card-meta">Computer Science · Level 300</p>
+                </div>
+            </div>
+
+            <div class="tag-list">
+                <span class="tag tag-blue">CSC301 Data Structures</span>
+                <span class="tag">CSC303 Algorithms</span>
+                <span class="tag">Database Systems</span>
+            </div>
+
+            <div class="match-bar-container">
+                <div>
+                    <span style="font-size: 0.75rem; color: var(--text-muted); display: block;">Compatibility</span>
+                    <span class="match-score-badge">
+                        <i data-lucide="check-check"></i> 94% Match
+                    </span>
+                </div>
+                <span class="tag tag-green">
+                    <i data-lucide="clock" style="width: 12px; height: 12px;"></i> Weekday Evenings
+                </span>
+            </div>
+        </div>
+
+        <div class="hero-card" style="margin-left: 28px; background: var(--card-subtle);">
+            <div style="display: flex; align-items: center; justify-content: space-between;">
+                <div style="display: flex; align-items: center; gap: 10px;">
+                    <div class="hero-card-avatar avatar-green" style="width: 40px; height: 40px; font-size: 1rem;">
+                        <span>KA</span>
+                    </div>
+                    <div>
+                        <strong style="display: block; font-size: 0.95rem;">Kofi Asante</strong>
+                        <span style="font-size: 0.78rem; color: var(--text-muted);">Level 300 · In-person</span>
+                    </div>
+                </div>
+                <span class="tag tag-blue">88% Match</span>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Features Grid -->
+<section class="feature-band">
+    <div class="section-heading">
+        <span class="section-eyebrow">Why StudyBuddy?</span>
+        <h2>Everything you need to study smarter</h2>
+        <p>Studying alone is tough. Group study with the wrong pace is worse. StudyBuddy helps you find peer matches who align with your goals.</p>
+    </div>
+
+    <div class="feature-grid">
+        <article class="feature-card">
+            <div class="feature-icon-box">
+                <i data-lucide="target"></i>
+            </div>
+            <h3>Smart Algorithm Matching</h3>
+            <p>Our matching engine ranks partners by shared courses, university, academic level, and preferred study styles.</p>
+        </article>
+
+        <article class="feature-card">
+            <div class="feature-icon-box" style="background: var(--success-light); color: var(--success);">
+                <i data-lucide="book-open"></i>
+            </div>
+            <h3>Course-Specific Focus</h3>
+            <p>Filter by exact course codes and syllabi to solve difficult problem sets and prepare for midterms together.</p>
+        </article>
+
+        <article class="feature-card">
+            <div class="feature-icon-box" style="background: var(--warning-light); color: var(--warning);">
+                <i data-lucide="calendar"></i>
+            </div>
+            <h3>Flexible Study Modes</h3>
+            <p>Whether you prefer library meetups on campus, virtual Google Meet / Zoom sessions, or a mix of both.</p>
+        </article>
+    </div>
+</section>
+
+<!-- How It Works Section -->
+<section class="steps-section">
+    <div class="section-heading">
+        <span class="section-eyebrow">Simple 3-Step Process</span>
+        <h2>How StudyBuddy Works</h2>
+        <p>Get set up and connected in under two minutes.</p>
+    </div>
+
+    <div class="steps-grid">
+        <div class="step-card">
+            <span class="step-number">1</span>
+            <h3>Build Your Profile</h3>
+            <p>Select your university, department, level, and enrolled courses to define your academic footprint.</p>
+        </div>
+        <div class="step-card">
+            <span class="step-number">2</span>
+            <h3>Explore Ranked Matches</h3>
+            <p>Review potential partners with compatibility scores, shared subjects, and availability slots.</p>
+        </div>
+        <div class="step-card">
+            <span class="step-number">3</span>
+            <h3>Connect & Excel</h3>
+            <p>Send a personalized study invite, accept requests, and schedule productive joint study sessions.</p>
+        </div>
+    </div>
+</section>
+
+<!-- Call to Action Banner -->
+<section class="cta-band">
+    <div class="cta-box">
+        <div class="cta-content">
+            <h2>Ready to boost your grades this semester?</h2>
+            <p>Join hundreds of students in Ghana making learning more collaborative and engaging.</p>
+        </div>
+        {% if user.is_authenticated %}
+            <a class="btn" href="{% url 'studybuddy:find_partners' %}">
+                Find Your Match Now <i data-lucide="arrow-right"></i>
+            </a>
+        {% else %}
+            <a class="btn" href="{% url 'studybuddy:register' %}">
+                Sign Up Now <i data-lucide="arrow-right"></i>
+            </a>
+        {% endif %}
+    </div>
+</section>
+{% endblock %}

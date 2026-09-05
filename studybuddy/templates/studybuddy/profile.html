@@ -1,0 +1,85 @@
+{% extends 'studybuddy/base.html' %}
+{% block title %}My Profile | StudyBuddy{% endblock %}
+
+{% block content %}
+<div class="profile-layout">
+    <div class="page-header" style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 16px;">
+        <div>
+            <h1 class="page-title">My Profile</h1>
+            <p class="page-subtitle">Your public student identity visible to potential study partners.</p>
+        </div>
+        <a class="btn btn-secondary" href="{% url 'studybuddy:edit_profile' %}">
+            <i data-lucide="edit-3"></i> Edit Profile
+        </a>
+    </div>
+
+    <!-- Profile Hero Card -->
+    <div class="profile-hero-card">
+        <div class="profile-hero-avatar">
+            {{ profile.user.first_name|slice:":1"|default:profile.user.username|slice:":1"|upper }}
+        </div>
+        <div class="profile-hero-details">
+            <h1>{{ profile }}</h1>
+            <p class="profile-academic-line">
+                <i data-lucide="graduation-cap" style="width: 16px; height: 16px; color: var(--primary);"></i>
+                <span>{{ profile.university.name }}</span>
+                <span>·</span>
+                <span>{{ profile.programme.name }}</span>
+                <span>·</span>
+                <strong>Level {{ profile.level }}</strong>
+            </p>
+
+            <div class="tag-list">
+                <span class="tag tag-blue">
+                    <i data-lucide="compass" style="width: 12px; height: 12px;"></i>
+                    {{ profile.get_study_preference_display }}
+                </span>
+                {% if profile.availability %}
+                    <span class="tag tag-green">
+                        <i data-lucide="clock" style="width: 12px; height: 12px;"></i>
+                        {{ profile.availability }}
+                    </span>
+                {% endif %}
+                <span class="tag">
+                    <i data-lucide="mail" style="width: 12px; height: 12px;"></i>
+                    {{ profile.user.email }}
+                </span>
+            </div>
+
+            <p class="profile-bio-text">
+                {{ profile.bio|default:'No bio added yet. Add a short note about your goals, study habits, and favorite topics by editing your profile.' }}
+            </p>
+        </div>
+    </div>
+
+    <!-- Courses Card -->
+    <div class="profile-courses-card">
+        <h2>
+            <i data-lucide="book-open" style="color: var(--primary);"></i>
+            Enrolled Courses ({{ profile.courses.count }})
+        </h2>
+
+        {% if profile.courses.all %}
+            <div class="course-badge-grid">
+                {% for course in profile.courses.all %}
+                    <div class="course-item-box">
+                        <strong>{{ course.code }}</strong>
+                        <span>{{ course.name }}</span>
+                    </div>
+                {% endfor %}
+            </div>
+        {% else %}
+            <div class="empty-state" style="padding: 32px 16px;">
+                <div class="empty-state-icon" style="width: 48px; height: 48px; margin-bottom: 12px;">
+                    <i data-lucide="book-plus"></i>
+                </div>
+                <h3>No courses added yet</h3>
+                <p>Adding your current courses will help the algorithm match you with students preparing for the same exams.</p>
+                <a class="btn btn-primary btn-sm" href="{% url 'studybuddy:edit_profile' %}">
+                    Select Courses
+                </a>
+            </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

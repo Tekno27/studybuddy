@@ -1,0 +1,122 @@
+{% extends 'studybuddy/base.html' %}
+{% block title %}Create Account | StudyBuddy{% endblock %}
+
+{% block content %}
+<div class="auth-wrapper" style="max-width: 580px;">
+    <div class="auth-card">
+        <div class="auth-header">
+            <span class="brand-mark" style="margin: 0 auto; width: 44px; height: 44px; font-size: 1.3rem;" aria-hidden="true">S</span>
+            <h1>Join StudyBuddy</h1>
+            <p>Connect with students in your courses, build study habits, and ace your exams.</p>
+        </div>
+
+        <form method="post" action="{% url 'studybuddy:register' %}" data-draft-key="registration">
+            {% csrf_token %}
+
+            {% if form.non_field_errors %}
+                <div class="alert alert-error" style="margin-bottom: 20px;">
+                    <div class="alert-content">
+                        <i data-lucide="alert-circle"></i>
+                        <span>{{ form.non_field_errors }}</span>
+                    </div>
+                </div>
+            {% endif %}
+
+            <!-- Name Row -->
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 14px;">
+                <div class="form-group">
+                    <label class="form-label" for="{{ form.first_name.id_for_label }}">First Name</label>
+                    {{ form.first_name }}
+                    {% if form.first_name.errors %}
+                        <ul class="form-errors">{% for err in form.first_name.errors %}<li>{{ err }}</li>{% endfor %}</ul>
+                    {% endif %}
+                </div>
+                <div class="form-group">
+                    <label class="form-label" for="{{ form.last_name.id_for_label }}">Last Name</label>
+                    {{ form.last_name }}
+                    {% if form.last_name.errors %}
+                        <ul class="form-errors">{% for err in form.last_name.errors %}<li>{{ err }}</li>{% endfor %}</ul>
+                    {% endif %}
+                </div>
+            </div>
+
+            <!-- Email -->
+            <div class="form-group">
+                <label class="form-label" for="{{ form.email.id_for_label }}">Student Email Address</label>
+                <div class="form-input-with-icon">
+                    <i data-lucide="mail"></i>
+                    {{ form.email }}
+                </div>
+                <span class="form-help">This will also be your username for login.</span>
+                {% if form.email.errors %}
+                    <ul class="form-errors">{% for err in form.email.errors %}<li>{{ err }}</li>{% endfor %}</ul>
+                {% endif %}
+            </div>
+
+            <!-- Academic Info -->
+            <div class="form-group">
+                <label class="form-label" for="{{ form.university.id_for_label }}">University</label>
+                {{ form.university }}
+                {% if form.university.errors %}
+                    <ul class="form-errors">{% for err in form.university.errors %}<li>{{ err }}</li>{% endfor %}</ul>
+                {% endif %}
+            </div>
+
+            <div style="display: grid; grid-template-columns: 2fr 1fr; gap: 14px;">
+                <div class="form-group">
+                    <label class="form-label" for="{{ form.programme.id_for_label }}">Programme of Study</label>
+                    {{ form.programme }}
+                    {% if form.programme.errors %}
+                        <ul class="form-errors">{% for err in form.programme.errors %}<li>{{ err }}</li>{% endfor %}</ul>
+                    {% endif %}
+                </div>
+                <div class="form-group">
+                    <label class="form-label" for="{{ form.level.id_for_label }}">Level</label>
+                    {{ form.level }}
+                    {% if form.level.errors %}
+                        <ul class="form-errors">{% for err in form.level.errors %}<li>{{ err }}</li>{% endfor %}</ul>
+                    {% endif %}
+                </div>
+            </div>
+
+            <!-- Passwords -->
+            <div class="form-group">
+                <label class="form-label" for="{{ form.password1.id_for_label }}">Password</label>
+                <div class="form-input-with-icon">
+                    <i data-lucide="lock"></i>
+                    {{ form.password1 }}
+                    <button class="password-toggle-btn" type="button" data-toggle-password="#{{ form.password1.id_for_label }}" aria-label="Toggle password visibility">
+                        <i data-lucide="eye"></i>
+                    </button>
+                </div>
+                {% if form.password1.errors %}
+                    <ul class="form-errors">{% for err in form.password1.errors %}<li>{{ err }}</li>{% endfor %}</ul>
+                {% endif %}
+            </div>
+
+            <div class="form-group">
+                <label class="form-label" for="{{ form.password2.id_for_label }}">Confirm Password</label>
+                <div class="form-input-with-icon">
+                    <i data-lucide="lock"></i>
+                    {{ form.password2 }}
+                    <button class="password-toggle-btn" type="button" data-toggle-password="#{{ form.password2.id_for_label }}" aria-label="Toggle password visibility">
+                        <i data-lucide="eye"></i>
+                    </button>
+                </div>
+                {% if form.password2.errors %}
+                    <ul class="form-errors">{% for err in form.password2.errors %}<li>{{ err }}</li>{% endfor %}</ul>
+                {% endif %}
+            </div>
+
+            <button class="btn btn-primary btn-lg btn-full" type="submit" style="margin-top: 14px;">
+                <i data-lucide="user-plus"></i> Create Account
+            </button>
+        </form>
+
+        <div class="auth-footer">
+            <span>Already have an account?</span>
+            <a href="{% url 'studybuddy:login' %}">Log in</a>
+        </div>
+    </div>
+</div>
+{% endblock %}

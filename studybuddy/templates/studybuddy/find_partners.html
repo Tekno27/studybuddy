@@ -1,0 +1,107 @@
+{% extends 'studybuddy/base.html' %}
+{% block title %}Find Study Partners | StudyBuddy{% endblock %}
+
+{% block content %}
+<div class="matches-layout">
+    <div class="page-header">
+        <h1 class="page-title">Find Study Partners</h1>
+        <p class="page-subtitle">Browse students by course, programme, or study style, ranked by match score.</p>
+    </div>
+
+    <!-- Filter & Search Panel -->
+    <form method="get" class="filters-panel" action="{% url 'studybuddy:find_partners' %}">
+        <div class="search-field">
+            <i data-lucide="search"></i>
+            {{ form.query }}
+        </div>
+        <div class="filter-grid">
+            <div>{{ form.university }}</div>
+            <div>{{ form.programme }}</div>
+            <div>{{ form.level }}</div>
+            <div>{{ form.course }}</div>
+            <div>{{ form.study_preference }}</div>
+            <button class="btn btn-primary btn-sm" type="submit">
+                <i data-lucide="filter"></i> Filter
+            </button>
+            <a class="btn btn-secondary btn-sm" href="{% url 'studybuddy:find_partners' %}">
+                Clear
+            </a>
+        </div>
+    </form>
+
+    <div class="results-meta">
+        <span>Showing <strong>{{ partners|length }}</strong> potential study partner{{ partners|length|pluralize }}</span>
+        {% if request.GET.query or request.GET.university or request.GET.programme or request.GET.course %}
+            <a href="{% url 'studybuddy:find_partners' %}" style="color: var(--primary); font-size: 0.8125rem;">
+                <i data-lucide="rotate-ccw" style="width: 13px; height: 13px;"></i> Reset active filters
+            </a>
+        {% endif %}
+    </div>
+
+    <!-- Partners Grid -->
+    <div class="partners-grid">
+        {% for partner, score in partners %}
+            <article class="partner-card">
+                <div class="partner-header">
+                    <div class="partner-profile-meta">
+                        <div class="partner-avatar">
+                            {{ partner.user.first_name|slice:":1"|default:partner.user.username|slice:":1"|upper }}
+                        </div>
+                        <div class="partner-name-box">
+                            <h2>{{ partner }}</h2>
+                            <p>{{ partner.programme.name }} · Level {{ partner.level }}</p>
+                        </div>
+                    </div>
+                    <div class="partner-score-pill">
+                        <strong>{{ score }}%</strong>
+                        <small>Match</small>
+                    </div>
+                </div>
+
+                <div class="partner-info-row">
+                    <i data-lucide="map-pin" style="width: 14px; height: 14px; color: var(--text-muted);"></i>
+                    <span>{{ partner.university.name }}</span>
+                </div>
+
+                <div class="tag-list">
+                    {% for course in partner.courses.all|slice:':4' %}
+                        <span class="tag tag-blue">{{ course.code }}</span>
+                    {% empty %}
+                        <span class="tag">No specific courses listed</span>
+                    {% endfor %}
+                </div>
+
+                <div class="partner-footer-tags">
+                    <span class="tag">{{ partner.get_study_preference_display }}</span>
+                    {% if partner.availability %}
+                        <span class="tag tag-green">
+                            <i data-lucide="clock" style="width: 12px; height: 12px;"></i> {{ partner.availability }}
+                        </span>
+                    {% endif %}
+                </div>
+
+                <div class="partner-card-action">
+                    <button class="btn btn-primary btn-sm btn-full"
+                            type="button"
+                            data-open-request-modal
+                            data-action-url="{% url 'studybuddy:send_study_request' partner.pk %}"
+                            data-partner-name="{{ partner }}">
+                        <i data-lucide="send"></i> Send Study Request
+                    </button>
+                </div>
+            </article>
+        {% empty %}
+            <div class="empty-state">
+                <div class="empty-state-icon">
+                    <i data-lucide="users"></i>
+                </div>
+                <h2>No students match your criteria</h2>
+                <p>Try broadening your filters or clearing search keywords to explore more partners.</p>
+                <a class="btn btn-primary" href="{% url 'studybuddy:find_partners' %}">
+                    <i data-lucide="rotate-ccw"></i> Reset Filters
+                </a>
+            </div>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %}
