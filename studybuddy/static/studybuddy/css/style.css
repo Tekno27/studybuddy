@@ -130,6 +130,7 @@ html.dark-theme {
 html {
   scroll-behavior: smooth;
   -webkit-text-size-adjust: 100%;
+  text-size-adjust: 100%;
 }
 
 body {
@@ -834,6 +835,7 @@ html.dark-theme .site-header {
 .hero h1 span {
   background: linear-gradient(135deg, var(--primary), #7c3aed);
   -webkit-background-clip: text;
+  background-clip: text;
   -webkit-text-fill-color: transparent;
 }
 
@@ -2050,6 +2052,7 @@ html.dark-theme .site-header {
   font-size: 0.875rem;
   font-weight: 500;
   color: var(--text);
+  -webkit-user-select: none;
   user-select: none;
   margin: 0;
 }
